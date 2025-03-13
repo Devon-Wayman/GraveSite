@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35825.156
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinderScraper", "FinderScraper\FinderScraper.csproj", "{E089CA76-CF80-4F20-A97D-DDB1A6F86DEC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestingRoom", "TestingRoom\TestingRoom.csproj", "{33C51C2C-47DD-4FD9-9359-3710EF7800D2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E089CA76-CF80-4F20-A97D-DDB1A6F86DEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E089CA76-CF80-4F20-A97D-DDB1A6F86DEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E089CA76-CF80-4F20-A97D-DDB1A6F86DEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E089CA76-CF80-4F20-A97D-DDB1A6F86DEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33C51C2C-47DD-4FD9-9359-3710EF7800D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33C51C2C-47DD-4FD9-9359-3710EF7800D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33C51C2C-47DD-4FD9-9359-3710EF7800D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33C51C2C-47DD-4FD9-9359-3710EF7800D2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {21C3BE09-3AD0-43FE-83FB-49443C481BE2}
+	EndGlobalSection
+EndGlobal
