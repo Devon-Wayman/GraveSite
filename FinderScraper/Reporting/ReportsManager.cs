@@ -11,7 +11,7 @@ namespace FinderScraper.Reporting
         {
             try
             {
-                MainReportsPath = Path.Combine($"{AppDomain.CurrentDomain.BaseDirectory}\\Reports", $"{cemeteryName}_{DateTime.Now.ToString("yyyyMMdd_HHmmss")}");
+                MainReportsPath = Path.Combine($"{AppDomain.CurrentDomain.BaseDirectory}", "Reports", $"{cemeteryName}_{DateTime.Now.ToString("yyyyMMdd_HHmmss")}");
                 Directory.CreateDirectory(MainReportsPath);
             }
             catch (Exception ex)
