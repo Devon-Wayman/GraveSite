@@ -35,7 +35,6 @@ namespace TestingRoom
             #endregion
 
             Cemetery tempCem = GetCemeteryInfo().GetAwaiter().GetResult();
-            //totalMemorials = tempCem.MemorialCount;
 
             Console.WriteLine($"Memorial Count: {tempCem.MemorialCount}");
 
@@ -44,9 +43,10 @@ namespace TestingRoom
             Console.WriteLine("SUCCESS");
 
             Console.WriteLine("Writing data to xlsx file...");
-            FinderScraper.Reporting.WorkbookManager.SaveToExcel(memorials, cemeteryName);
+            FinderScraper.Reporting.ReportsManager.InitReports(memorials, cemeteryName);
             Console.WriteLine("SUCCESS");
 
+            Console.WriteLine("Press Enter to exit...");
             Console.ReadKey();
             Environment.Exit(0);
         }
@@ -69,7 +69,6 @@ namespace TestingRoom
         static async Task<List<Memorial>> RetrieveAllMemorials(int memCount)
         {
             List<Memorial> test = await FinderScraper.HelperFunctions.GetAllMemorials(cemeteryId, memCount);
-            Console.WriteLine($"Memorials found: {test.Count}");
             return test;
         }
     }

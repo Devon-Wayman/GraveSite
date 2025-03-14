@@ -9,7 +9,6 @@ namespace FinderScraper
 {
     public class HelperFunctions
     {
-
         #region Common FindAGrave API Requests
         /// <summary>
         /// Returns all memorial info from a given cemetery ID
@@ -70,7 +69,7 @@ namespace FinderScraper
                                         BirthYear = memorial["birthYear"]?.ToObject<int>() ?? 0,
                                         DeathYear = memorial["deathYear"]?.ToObject<int>() ?? 0,
                                         ApproxAge = memorial["deathYear"]?.ToObject<int>() - memorial["birthYear"]?.ToObject<int>() ?? 0,
-                                        GoogleMapsLink = $"https://www.google.com/maps/place/{memorial["location"]?[1]},{memorial["location"]?[0]}"
+                                        GoogleMapsLink = $"https://www.google.com/maps/place/{memorial["location"]?[1]},{memorial["location"]?[0]}",
                                     });
                                 }
                             }

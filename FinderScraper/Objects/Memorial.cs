@@ -53,14 +53,16 @@ namespace FinderScraper.Objects
             GoogleMapsLink = GetGoogleMapsLink(location)!;
         }
 
-        private string? GetGoogleMapsLink(float[]? location)
+
+
+
+        string? GetGoogleMapsLink(float[]? location)
         {
             if (location == null || location.Length == 0)
             {
                 return "";
             }
 
-            // if location is not null, return the Google Maps link
             return $"https://www.google.com/maps/place/{location[0]},{location[1]}";
         }
     }

@@ -1,42 +1,48 @@
 ﻿using OfficeOpenXml;
+using OfficeOpenXml.DataValidation.Contracts;
 
 namespace FinderScraper.Reporting
 {
-    public class WorkbookManager
+    public class ReportsManager
     {
-        // This class will be used to manage the creation of Excel workbooks
+        static string MainReportsPath = string.Empty;
 
-        // set the path for the main xlsx file to the working directory of the executable and name it AllMemorials.xlsx
-        public static string MainWorkbookPath = $"{AppDomain.CurrentDomain.BaseDirectory}\\AllMemorials.xlsx";
-
-        public static void SaveToExcel<T>(List<T> data, string sheetName)
+        public static void InitReports<T>(List<T> data, string cemeteryName)
         {
+            try
+            {
+                MainReportsPath = Path.Combine($"{AppDomain.CurrentDomain.BaseDirectory}\\Reports", $"{cemeteryName}_{DateTime.Now.ToString("yyyyMMdd_HHmmss")}");
+                Directory.CreateDirectory(MainReportsPath);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error creating directory: {ex.Message}");
+            }
+
+            SaveToExcel(data, cemeteryName);
+        }
+
+        static void SaveToExcel<T>(List<T> data, string sheetName)
+        {
+            string MainWorkbookPath = Path.Combine(MainReportsPath, $"{sheetName}.xlsx");
             Console.WriteLine($"Saving data to {MainWorkbookPath}");
-            // This method will save the data to the workbook
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
             using (ExcelPackage package = new ExcelPackage(new FileInfo(MainWorkbookPath)))
             {
                 // Check if the sheet already exists
-                ExcelWorksheet worksheet = package.Workbook.Worksheets.FirstOrDefault(ws => ws.Name == sheetName);
+                ExcelWorksheet worksheet = package.Workbook.Worksheets.FirstOrDefault(ws => ws.Name == sheetName) ?? package.Workbook.Worksheets.Add(sheetName);
 
-                // If the sheet exists, clear the data
-                if (worksheet != null)
-                {
-                    // Clear existing data
-                    worksheet.Cells.Clear();
-                }
-                else
-                {
-                    // Create new worksheet
-                    worksheet = package.Workbook.Worksheets.Add(sheetName);
-                }
+                // Clear existing data
+                worksheet.Cells.Clear();
 
                 // Write headers
-                var properties = typeof(T).GetProperties();
+                System.Reflection.PropertyInfo[] properties = typeof(T).GetProperties();
                 for (int i = 0; i < properties.Length; i++)
                 {
-                    worksheet.Cells[1, i + 1].Value = properties[i].Name;
+                    var cell = worksheet.Cells[1, i + 1];
+                    cell.Value = properties[i].Name;
+                    cell.Style.Font.Bold = true; // Make the header bold
                 }
 
                 // Write data
@@ -44,33 +50,49 @@ namespace FinderScraper.Reporting
                 {
                     for (int col = 0; col < properties.Length; col++)
                     {
-                        // if the data is an array, convert it to a concatenated string. examples include Spouse, Parents and Siblings
+                        // if the data is an array, convert the cell to a dropdown
                         if (properties[col].PropertyType == typeof(string[]))
                         {
-                            // make the cell containing the string array data into a dropdown
-                            var cell = worksheet.Cells[row + 2, col + 1];
-                            var arrayData = (string[])properties[col].GetValue(data[row]);
-                            cell.Value = arrayData.FirstOrDefault(); // Set the first entry as the default value
-                            cell.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                            cell.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.White);
-                            cell.Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
-
-                            var validation = worksheet.DataValidations.AddListValidation(cell.Address);
-                            foreach (var item in arrayData)
+                            ExcelRange cell = worksheet.Cells[row + 2, col + 1];
+                            if (worksheet.DataValidations[cell.Address] != null)
                             {
-                                validation.Formula.Values.Add(item);
+                                worksheet.DataValidations.Remove(worksheet.DataValidations[cell.Address]);
                             }
-                            validation.ShowErrorMessage = true;
+                            IExcelDataValidationList validation = worksheet.DataValidations.AddListValidation(cell.Address);
+
+                            string[]? arrayData = properties[col].GetValue(data[row]) as string[];
+                            if (arrayData != null && arrayData.Length > 0)
+                            {
+                                cell.Value = arrayData.FirstOrDefault(); // Set the first entry as the default value
+                                cell.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                                cell.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.White);
+                                cell.Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+
+                                // Ensure the total length of the list does not exceed 255 characters
+                                int totalLength = arrayData.Sum(item => item.Length) + arrayData.Length - 1;
+                                if (totalLength <= 255)
+                                {
+                                    foreach (string item in arrayData)
+                                    {
+                                        validation.Formula.Values.Add(item);
+                                    }
+                                }
+                                else
+                                {
+                                    validation.Formula.Values.Add("List too long");
+                                }
+
+                                validation.ShowErrorMessage = true;
+                            }
                         }
                         // if the data is a float array with the name Location, convert it to a concatenated string
                         else if (properties[col].PropertyType == typeof(float[]) && properties[col].Name == "Location")
                         {
-                            var location = (float[])properties[col].GetValue(data[row]);
+                            float[]? location = properties[col].GetValue(data[row]) as float[];
                             if (location != null && location.Length >= 2)
                             {
                                 Array.Reverse(location);
                                 worksheet.Cells[row + 2, col + 1].Value = string.Join(", ", location);
-                                // Add Google Maps link in the next column
                                 var hyperlink = worksheet.Cells[row + 2, col + 2].Hyperlink = new Uri($"https://www.google.com/maps?q={location[0]},{location[1]}");
                                 worksheet.Cells[row + 2, col + 2].Value = "Google Maps Link";
                                 worksheet.Cells[row + 2, col + 2].Style.Font.UnderLine = true;
