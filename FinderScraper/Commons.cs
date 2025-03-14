@@ -26,11 +26,9 @@
         #endregion
 
 
-        public static string CemeteryInfoRequestBody(string cemeteryId)
+        public static string CemeteryInfoRequestBody(int cemeteryId)
         {
-            if (string.IsNullOrEmpty(cemeteryId)) return string.Empty;
-
-            return MemorialCountTemplate.Replace("CEM_ID_HERE", cemeteryId);
+            return MemorialCountTemplate.Replace("CEM_ID_HERE", cemeteryId.ToString());
         }
     }
 }

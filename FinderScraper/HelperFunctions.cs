@@ -19,14 +19,13 @@ namespace FinderScraper
         /// <returns></returns>
         public static async Task<List<Memorial>> GetAllMemorials(int cemeteryId, int totalMemorials)
         {
-            Console.WriteLine($"Beginning memorial retrival, Total memorials: {totalMemorials}");
+            Console.WriteLine($"Beginning memorial retrival. Total memorials: {totalMemorials}");
             List<string> urls = new();
             int currentSkip = 0;
             while (currentSkip < totalMemorials)
             {
                 urls.Add($"https://www.findagrave.com/memorial/search?cemeteryId={cemeteryId}&orderby=r&skip={currentSkip}&limit=100");
                 currentSkip += 100;
-                Console.WriteLine($"Added URL");
             }
 
             Console.WriteLine($"Total URLs: {urls.Count}");
@@ -67,7 +66,11 @@ namespace FinderScraper
                                         Spouses = memorial["Spouses"]?.ToObject<string[]>() ?? Array.Empty<string>(),
                                         Siblings = memorial["Siblings"]?.ToObject<string[]>() ?? Array.Empty<string>(),
                                         Children = memorial["Children"]?.ToObject<string[]>() ?? Array.Empty<string>(),
-                                        Location = memorial["location"]?.ToObject<float[]>() ?? Array.Empty<float>()
+                                        Location = memorial["location"]?.ToObject<float[]>() ?? Array.Empty<float>(),
+                                        BirthYear = memorial["birthYear"]?.ToObject<int>() ?? 0,
+                                        DeathYear = memorial["deathYear"]?.ToObject<int>() ?? 0,
+                                        ApproxAge = memorial["deathYear"]?.ToObject<int>() - memorial["birthYear"]?.ToObject<int>() ?? 0,
+                                        GoogleMapsLink = $"https://www.google.com/maps/place/{memorial["location"]?[1]},{memorial["location"]?[0]}"
                                     });
                                 }
                             }
