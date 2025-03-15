@@ -9,6 +9,20 @@ namespace FinderScraper
 {
     public class HelperFunctions
     {
+
+        public static event Action<Memorial>? MemorialProcessed;
+
+
+        /// <summary>
+        /// Calls an event to notify subscribers that a memorial has been processed
+        /// </summary>
+        /// <param name="memorial">The memorial object that has been processed</param> 
+        private static void OnMemorialProcessed(Memorial memorial)
+        {
+            MemorialProcessed?.Invoke(memorial);
+        }
+
+
         #region Common FindAGrave API Requests
         /// <summary>
         /// Returns all memorial info from a given cemetery ID
@@ -18,6 +32,8 @@ namespace FinderScraper
         /// <returns></returns>
         public static async Task<List<Memorial>> GetAllMemorials(int cemeteryId, int totalMemorials)
         {
+
+
             Console.WriteLine($"Beginning memorial retrival. Total memorials: {totalMemorials}");
             List<string> urls = new();
             int currentSkip = 0;
@@ -71,9 +87,13 @@ namespace FinderScraper
                                         ApproxAge = memorial["deathYear"]?.ToObject<int>() - memorial["birthYear"]?.ToObject<int>() ?? 0,
                                         GoogleMapsLink = $"https://www.google.com/maps/place/{memorial["location"]?[1]},{memorial["location"]?[0]}",
                                     });
+
+                                    // Notify subscribers that a memorial has been processed
+                                    OnMemorialProcessed(collectedMemorialsList.Last());
                                 }
                             }
                         }
+
                         Thread.Sleep(1000);
                     }
                     finally
@@ -167,6 +187,8 @@ namespace FinderScraper
         {
             WriteIndented = true
         };
+
+
         public static string PrettyPrintJson(string jsonString)
         {
             JsonElement jsonElement = System.Text.Json.JsonSerializer.Deserialize<JsonElement>(jsonString);

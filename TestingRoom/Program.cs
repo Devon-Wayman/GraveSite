@@ -1,4 +1,5 @@
 ﻿using FinderScraper.Objects;
+using ShellProgressBar;
 using CommonItems = FinderScraper.Commons;
 
 namespace TestingRoom
@@ -39,7 +40,33 @@ namespace TestingRoom
             Console.WriteLine($"Memorial Count: {tempCem.MemorialCount}");
 
             Console.WriteLine("Retrieving all memorial data...");
-            List<Memorial> memorials = RetrieveAllMemorials(tempCem.MemorialCount).GetAwaiter().GetResult();
+
+            // TODO: Implement ShellProgressBar to capture update messages and progress to update the user
+            var options = new ProgressBarOptions
+            {
+                ForegroundColor = ConsoleColor.Yellow,
+                BackgroundColor = ConsoleColor.DarkGray,
+                ProgressCharacter = '─',
+                DisplayTimeInRealTime = true
+            };
+
+            // Initialize the total memorials list
+            List<Memorial> memorials = new();
+
+            int memorialsProcessed = 0;
+            using (var progressBar = new ProgressBar(tempCem.MemorialCount, "Retrieving memorials...", options))
+            {
+                FinderScraper.HelperFunctions.MemorialProcessed += memorial =>
+                {
+                    memorialsProcessed++;
+                    progressBar.Tick(memorialsProcessed, $"Processing memorial {memorialsProcessed} of {tempCem.MemorialCount}...");
+                };
+
+                memorials = RetrieveAllMemorials(tempCem.MemorialCount).GetAwaiter().GetResult();
+            }
+
+            // all original
+            // List<Memorial> memorials = RetrieveAllMemorials(tempCem.MemorialCount).GetAwaiter().GetResult();
             Console.WriteLine("SUCCESS");
 
             Console.WriteLine("Writing data to xlsx file...");
